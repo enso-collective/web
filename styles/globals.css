@@ -7,6 +7,7 @@
   body,
   #__next {
     @apply h-full bg-privy-color-background text-privy-color-foreground-2;
+    
   }
 
   a {
@@ -46,9 +47,15 @@
 
 @layer utilities {
   .bg-dotgrid-light {
-    background-image: radial-gradient(var(--privy-color-foreground-4) 1px, transparent 0);
-    background-size: 24px 24px;
-    background-position: -19px -19px;
+    background-image: url('../public/images/denverbackground.png');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
   }
 
   .no-scrollbar {

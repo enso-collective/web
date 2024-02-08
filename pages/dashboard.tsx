@@ -42,6 +42,7 @@ import Image from 'next/image';
 import PrivyBlobIcon from '../components/icons/outline/privy-blob';
 import GitHubIcon from '../components/icons/social/github';
 import AppleIcon from '../components/icons/social/apple';
+import PhaverIcon from '../components/icons/social/phaver';
 import TikTokIcon from '../components/icons/social/tiktok';
 import TwitterXIcon from '../components/icons/social/twitter-x';
 import FramesCard from '../components/frames-card';
@@ -98,6 +99,8 @@ export default function DashboardPage() {
     unlinkGithub,
     linkApple,
     unlinkApple,
+    linkPhaver,
+    unlinkPhaver,
     linkLinkedIn,
     unlinkLinkedIn,
     linkTiktok,
@@ -169,6 +172,9 @@ export default function DashboardPage() {
   const appleSubject = user?.apple?.subject;
   const appleEmail = user?.apple?.email;
 
+  const phaverSubject = user?.phaver?.subject;
+  const phaverEmail = user?.phaver?.email;
+
   const tiktokSubject = user?.tiktok?.subject;
   const tiktokUsername = user?.tiktok?.username;
 
@@ -210,61 +216,13 @@ export default function DashboardPage() {
   return (
     <>
       <Head>
-        <title>Privy Demo</title>
+        <title>Proof of SheFi</title>
       </Head>
 
       <div className="flex h-full flex-col px-6 pb-6">
         <Header />
-        <CanvasContainer className="flex-col-reverse">
-          <CanvasSidebar className="md:px-6 md:pb-6">
-            <CanvasSidebarHeader className="hidden md:flex">
-              <CommandLineIcon className="h-5 w-5" strokeWidth={2} />
-              <div className="w-full">Console</div>
-            </CanvasSidebarHeader>
-            <div className="hidden py-4 md:block md:h-full">
-              <textarea
-                value={JSON.stringify(removeUnknownWalletClients(user), null, 2)}
-                className="no-scrollbar h-full w-full resize-none rounded-lg border-0 bg-privy-color-background-2 p-4 font-mono text-xs text-privy-color-foreground-2"
-                disabled
-              />
-            </div>
-            <div className="hidden shrink-0 grow-0 pb-4 text-sm text-privy-color-foreground-3 md:block">
-              Privy gives you modular components so you can customize your product for your users.
-              Learn more in{' '}
-              <a href="https://docs.privy.io/guide/frontend/users/object" target="_blank">
-                our docs
-              </a>
-              .
-            </div>
-            <CanvasCard className="mb-8 shrink-0 grow-0 md:mb-0 md:!shadow-none">
-              <div className="pb-4 text-sm text-privy-color-foreground-3">
-                Sign out or delete your data to restart the demo and customize your theme.
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    logout();
-                  }}
-                  className="button h-8 gap-x-1 px-3 text-sm"
-                >
-                  <ArrowLeftOnRectangleIcon className="h-4 w-4" strokeWidth={2} />
-                  Sign out
-                </button>
-                <button
-                  onClick={async () => {
-                    setIsDeleting(true);
-                    await deleteUser();
-                    setIsDeleting(true);
-                  }}
-                  className="button h-8 gap-x-2 px-3 text-sm !text-red-400"
-                >
-                  {!isDeleting ? 'Delete Account' : 'Deleting account...'}
-                </button>
-              </div>
-            </CanvasCard>
-          </CanvasSidebar>
-          <Canvas className="gap-x-8">
+        <CanvasContainer className="flex-col-reverse justify-center items-center">
+          <Canvas className="gap-x-8 justify-center items-center">
             <CanvasRow>
               {isMobile && <FramesCard />}
               <CanvasCard>
@@ -303,54 +261,6 @@ export default function DashboardPage() {
                     <PlusIcon className="h-4 w-4" strokeWidth={2} />
                     Link a Wallet
                   </button>
-                </div>
-              </CanvasCard>
-              <CanvasCard>
-                <CanvasCardHeader>
-                  <ArrowsUpDownIcon className="h-5 w-5" strokeWidth={2} />
-                  Wallet Actions
-                </CanvasCardHeader>
-                <div className="text-sm text-privy-color-foreground-3">
-                  Whether they came in with Metamask or an embedded wallet, a user is a user.
-                  Trigger wallet actions below.
-                </div>
-                <div className="flex flex-col gap-2 pt-4">
-                  <button
-                    className="button h-10 gap-x-1 px-4 text-sm"
-                    disabled={signLoading || !wallets.length || !activeWallet}
-                    onClick={() => {
-                      setSignError(false);
-                      setSignSuccess(false);
-                      setSignLoading(true);
-                      connectedWallets
-                        .find((wallet) => wallet.address === activeWallet?.address)
-                        ?.sign('Signing with the active wallet in Privy: ' + activeWallet?.address)
-                        .then(() => {
-                          setSignSuccess(true);
-                          setSignLoading(false);
-                        })
-                        .catch(() => {
-                          setSignError(true);
-                          setSignLoading(false);
-                        });
-                    }}
-                  >
-                    <PencilIcon className="h-4 w-4" strokeWidth={2} />
-                    Sign a Message
-                  </button>
-                  {signSuccess && (
-                    <DismissableSuccess
-                      message="Success!"
-                      clickHandler={() => setSignSuccess(false)}
-                    />
-                  )}
-                  {signError && (
-                    <DismissableError
-                      message="Signature failed"
-                      clickHandler={() => setSignError(false)}
-                    />
-                  )}
-                  {signLoading && <DismissableInfo message="Waiting for signature" />}
                 </div>
               </CanvasCard>
               {embeddedWallet ? (
@@ -438,23 +348,6 @@ export default function DashboardPage() {
 
                   <AuthLinker
                     socialIcon={
-                      <DevicePhoneMobileIcon
-                        className="h-[1.125rem] w-[1.125rem] shrink-0 grow-0"
-                        strokeWidth={2}
-                      />
-                    }
-                    label="Phone"
-                    linkedLabel={`${phoneNumber}`}
-                    canUnlink={canRemoveAccount}
-                    isLinked={!!phoneNumber}
-                    unlinkAction={() => {
-                      unlinkPhone(phoneNumber as string);
-                    }}
-                    linkAction={linkPhone}
-                  />
-
-                  <AuthLinker
-                    socialIcon={
                       <div className="h-[1.125rem] w-[1.125rem] shrink-0 grow-0">
                         <Image
                           src="/social-icons/color/google.svg"
@@ -493,43 +386,6 @@ export default function DashboardPage() {
 
                   <AuthLinker
                     socialIcon={
-                      <div className="h-[1.125rem] w-[1.125rem] shrink-0 grow-0">
-                        <Image
-                          src="/social-icons/color/discord.svg"
-                          height={20}
-                          width={20}
-                          alt="Discord"
-                        />
-                      </div>
-                    }
-                    label="Discord"
-                    linkedLabel={`${discordUsername}`}
-                    canUnlink={canRemoveAccount}
-                    isLinked={!!discordSubject}
-                    unlinkAction={() => {
-                      unlinkDiscord(discordSubject as string);
-                    }}
-                    linkAction={linkDiscord}
-                  />
-
-                  <AuthLinker
-                    socialIcon={
-                      <div className="h-[1.125rem] w-[1.125rem] shrink-0 grow-0">
-                        <GitHubIcon height={18} width={18} />
-                      </div>
-                    }
-                    label="Github"
-                    linkedLabel={`${githubUsername}`}
-                    canUnlink={canRemoveAccount}
-                    isLinked={!!githubSubject}
-                    unlinkAction={() => {
-                      unlinkGithub(githubSubject as string);
-                    }}
-                    linkAction={linkGithub}
-                  />
-
-                  <AuthLinker
-                    socialIcon={
                       <div className="h-[1.125rem] w-[1.125rem] shrink-0 grow-0 text-privy-color-foreground">
                         <AppleIcon height={18} width={18} />
                       </div>
@@ -543,6 +399,23 @@ export default function DashboardPage() {
                     }}
                     linkAction={linkApple}
                   />
+
+<AuthLinker
+                    socialIcon={
+                      <div className="h-[1.125rem] w-[1.125rem] shrink-0 grow-0 text-privy-color-foreground">
+                        <PhaverIcon height={18} width={18} />
+                      </div>
+                    }
+                    label="Phaver"
+                    linkedLabel={`${phaverEmail}`}
+                    canUnlink={canRemoveAccount}
+                    isLinked={!!phaverSubject}
+                    unlinkAction={() => {
+                      unlinkPhaver(phaverSubject as string);
+                    }}
+                    linkAction={linkPhaver}
+                  />
+
                   <AuthLinker
                     socialIcon={
                       <div className="h-[1.125rem] w-[1.125rem] shrink-0 grow-0">
@@ -566,21 +439,6 @@ export default function DashboardPage() {
                   <AuthLinker
                     socialIcon={
                       <div className="h-[1.125rem] w-[1.125rem] shrink-0 grow-0 text-privy-color-foreground">
-                        <TikTokIcon height={18} width={18} />
-                      </div>
-                    }
-                    label="TikTok"
-                    linkedLabel={`${tiktokUsername}`}
-                    canUnlink={canRemoveAccount}
-                    isLinked={!!tiktokSubject}
-                    unlinkAction={() => {
-                      unlinkTiktok(tiktokSubject as string);
-                    }}
-                    linkAction={linkTiktok}
-                  />
-                  <AuthLinker
-                    socialIcon={
-                      <div className="h-[1.125rem] w-[1.125rem] shrink-0 grow-0 text-privy-color-foreground">
                         <FarcasterIcon height={18} width={18} />
                       </div>
                     }
@@ -593,38 +451,6 @@ export default function DashboardPage() {
                     }}
                     linkAction={linkFarcaster}
                   />
-                </div>
-              </CanvasCard>
-              <CanvasCard>
-                <CanvasCardHeader>
-                  <LockClosedIcon className="h-5 w-5" strokeWidth={2} />
-                  <div className="w-full">Transaction MFA</div>
-                  <div className="flex shrink-0 grow-0 flex-row items-center justify-end gap-x-1 text-privy-color-foreground-3">
-                    {mfaEnabled ? 'Enabled' : 'Disabled'}
-                  </div>
-                </CanvasCardHeader>
-                <div className="text-sm text-privy-color-foreground-3">
-                  Add a second factor to sensitive embedded wallet actions to protect your account.
-                  Verification lasts for 15 minutes.
-                </div>
-                <div className="flex flex-col gap-2 pt-4">
-                  <button
-                    className="button h-10 gap-x-1 px-4 text-sm"
-                    disabled={!(ready && authenticated)}
-                    onClick={showMfaEnrollmentModal}
-                  >
-                    {!mfaEnabled ? (
-                      <>
-                        <PlusIcon className="h-4 w-4" strokeWidth={2} />
-                        Add MFA
-                      </>
-                    ) : (
-                      <>
-                        <PencilIcon className="h-4 w-4" strokeWidth={2} />
-                        Manage MFA
-                      </>
-                    )}
-                  </button>
                 </div>
               </CanvasCard>
             </CanvasRow>
